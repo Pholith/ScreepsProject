@@ -73,7 +73,11 @@ export class JobProtector extends JobContainer {
     public getJob(): Job { return Job.PROTECTOR; }
 
     public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
-        // TO IMPLEMENTE
+        if (Game.spawns["Spawn1"].room.find(FIND_HOSTILE_CREEPS, {
+            filter: (creep) =>  creep.body.map((part) => part.type).includes(ATTACK) ||
+                                creep.body.map((part) => part.type).includes(RANGED_ATTACK)
+        })[0])
+            return 2;
         return 0;
     }
     public getBodyType(): BodyType {

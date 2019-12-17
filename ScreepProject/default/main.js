@@ -25,15 +25,18 @@ module.exports.loop = function loop() {
         let structure = Game.structures[name];
         // TOWER
         if (structure.structureType == STRUCTURE_TOWER) {
-            let closestHostile = structure.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            let closestHostile = structure.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                filter: (creep) => creep.body.map((part) => part.type).includes(ATTACK) ||
+                    creep.body.map((part) => part.type).includes(RANGED_ATTACK)
+            });
             if (closestHostile)
                 structure.attack(closestHostile);
-            var closestDamagedStructure = structure.pos.findClosestByRange(FIND_STRUCTURES, {
+            /*var closestDamagedStructure = structure.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
-            });
-            if (closestDamagedStructure) {
-                structure.repair(closestDamagedStructure);
-            }
+            });*/
+            /*if (closestDamagedStructure) {
+                (structure as StructureTower).repair(closestDamagedStructure);
+            }*/
         }
     }
 };

@@ -1,5 +1,6 @@
 ﻿import { State, BodyType, Job } from "./Enums";
 import { CreepManager } from "./CreepManager";
+import { JobContainer } from "./JobContainer";
 
 export abstract class CreepContainer {
 
@@ -16,9 +17,9 @@ export abstract class CreepContainer {
 
         // change of job
         if (this.isWaiting()) {
-            let newJob: Job = CreepManager.choiceJob(true);
+            let newJob: JobContainer = CreepManager.choiceJob(true);
             if (newJob == null) this.changeJob(Job.UPGRADER);
-            else this.changeJob(newJob);
+            else this.changeJob(newJob.getJob());
         }
     }
     private changeJob(job: Job) {
@@ -28,6 +29,7 @@ export abstract class CreepContainer {
         var sources = this.creep.room.find(FIND_SOURCES);
         let target: Source;
         target = sources[this.creep.memory.random % sources.length];
+        if (target.energy < 20) target = sources[this.creep.memory.random + 1 % sources.length];
         if (this.creep.harvest(target) == ERR_NOT_IN_RANGE) {
             this.creep.moveTo(target);
         }

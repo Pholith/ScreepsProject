@@ -2,6 +2,7 @@
 import { CreepUtils } from "./CreepUtils";
 import { jobInstances } from "./JobInstances";
 import { fork } from "cluster";
+import { JobContainer } from "./JobContainer";
 
 export class CreepManager {
     public static run() {
@@ -34,14 +35,14 @@ export class CreepManager {
         for (let job of jobInstances) {
             console.log("  " + job.getJob() + "\tActual/Needed = " + this.numberOfRole(job.getJob()) + "/" + job.numberNeededOfThisJob());
         }
-        console.log("  Next job = " + this.choiceJob());
+        console.log("  Next job = " + this.choiceJob().getJob());
         console.log("\n");
     }
 
-    public static choiceJob(forceTheNeed: boolean = false): Job {
+    public static choiceJob(forceTheNeed: boolean = false): JobContainer {
         for (var job of jobInstances) {
             if (job.numberNeededOfThisJob(forceTheNeed) > this.numberOfRole(job.getJob())) {
-                return job.getJob();
+                return job;
             }
         }
         return null;
@@ -65,70 +66,96 @@ export class CreepManager {
         }
         return creepsThisJob.length;
     }
-    public static SpawnBiggestCreep(spawn: StructureSpawn, job2: Job): ScreepsReturnCode {
+    public static SpawnBiggestCreep(spawn: StructureSpawn, job: JobContainer): ScreepsReturnCode {
         if (spawn.spawning) return ERR_BUSY;
 
-        if (Memory.creepCounter == undefined) Memory.creepCounter = 0;
-        let newCounter: number = Memory.creepCounter + 1;
-
-        let bodyParts: Array<BodyPartConstant> = new Array();
-        bodyParts.push(MOVE);
-        bodyParts.push(WORK);
-        bodyParts.push(CARRY);
-        let totalCost: number = 200;
-        let name = "Pholith" + newCounter;
+        let baseBody: { baseBody: Array<BodyPartConstant>, availableParts: Array<BodyPartConstant>, basePrice: number } = this.getBaseBody(job.getBodyType())
+        let totalCost: number = baseBody.basePrice;
+        let bodyParts: Array<BodyPartConstant> = baseBody.baseBody;
 
         // case of 0 harvester
         if (this.numberOfRole(Job.HARVESTER) < 1 && spawn.room.energyAvailable < spawn.room.energyCapacityAvailable) {
-            let result2: ScreepsReturnCode = spawn.spawnCreep(bodyParts, name,
-                {
-                    memory: {
-                        job: Job.HARVESTER,
-                        random: Math.round(Math.random() * 999),
-                        state: State.HARVEST,
-                        bodyType: BodyType.WORKER
-                    }
-                });
-            if (result2 == OK) Memory.creepCounter = newCounter;
-            else if (result2 == ERR_NAME_EXISTS) Memory.creepCounter = newCounter;
-            
-            return result2;
+            return this.spawnAndUpdateCounter(spawn, bodyParts, job.getJob(), job.getBodyType());
         }
 
         let i: number = 0
         while (spawn.room.energyCapacityAvailable - totalCost > 45) {
-            if (i % 3 == 0) {
-                if (spawn.room.energyCapacityAvailable - totalCost > BODYPART_COST.work) {
-                    bodyParts.push(WORK);
-                    totalCost += BODYPART_COST.work;
-                }
-            } else if (i % 3 == 1) {
-                if (spawn.room.energyCapacityAvailable - totalCost > BODYPART_COST.move) {
-                    bodyParts.push(MOVE);
-                    totalCost += BODYPART_COST.move;
-                }
-            } else if (i % 3 == 2) {
-                if (spawn.room.energyCapacityAvailable - totalCost > BODYPART_COST.carry) {
-                    bodyParts.push(CARRY);
-                    totalCost += BODYPART_COST.carry;
-                }
+            if (spawn.room.energyCapacityAvailable - totalCost > baseBody.basePrice[i % baseBody.availableParts.length]) {
+
+                bodyParts.push(baseBody.availableParts[i % baseBody.availableParts.length]);
+                baseBody.basePrice[i % baseBody.availableParts.length];
             }
-            if (i > bodyParts.length) break;
+
+            if (i > bodyParts.length + baseBody.availableParts.length) return ERR_NOT_ENOUGH_ENERGY;
             i++;
         }
+
         bodyParts = bodyParts.sort();
+        bodyParts.reverse()
+        return this.spawnAndUpdateCounter(spawn, bodyParts, job.getJob(), job.getBodyType());
+    }
+
+    private static spawnAndUpdateCounter(spawn: StructureSpawn, bodyParts: Array<BodyPartConstant>, job: Job, bodyType: BodyType): ScreepsReturnCode {
+
+        if (Memory.creepCounter == undefined) Memory.creepCounter = 0;
+        let newCounter: number = Memory.creepCounter + 1;
+        let name = "Pholith" + newCounter;
+
         let result: ScreepsReturnCode = spawn.spawnCreep(bodyParts, name,
             {
                 memory: {
-                    job: job2,
+                    job: job,
                     random: Math.round(Math.random() * 999),
                     state: State.HARVEST,
-                    bodyType: BodyType.WORKER
+                    bodyType: bodyType
                 }
             });
         if (result == OK) Memory.creepCounter = newCounter;
         else if (result == ERR_NAME_EXISTS) Memory.creepCounter = newCounter;
         return result;
+    }
+
+    private static getBaseBody(bodyType: BodyType): { baseBody: Array<BodyPartConstant>, availableParts: Array<BodyPartConstant>, basePrice: number, partsCost: Array<number> } {
+        let basePrice: number = 0;
+        let availableParts: Array<BodyPartConstant> = new Array();
+        let baseBody: Array<BodyPartConstant> = new Array();
+        let partsCost: Array<number> = new Array();
+
+        switch (bodyType) {
+            case BodyType.FIGHTER:
+                baseBody.push(ATTACK);
+                baseBody.push(MOVE);
+                baseBody.push(TOUGH);
+                basePrice += BODYPART_COST.attack + BODYPART_COST.tough + BODYPART_COST.move
+                availableParts.push(ATTACK);
+                availableParts.push(MOVE);
+                availableParts.push(TOUGH);
+                partsCost.push(BODYPART_COST.attack);
+                partsCost.push(BODYPART_COST.tough);
+                partsCost.push(BODYPART_COST.move);
+                break;
+
+            case BodyType.HEALER:
+            case BodyType.WORKER:
+                baseBody.push(WORK);
+                baseBody.push(MOVE);
+                baseBody.push(CARRY);
+                basePrice += BODYPART_COST.work + BODYPART_COST.carry + BODYPART_COST.move
+                availableParts.push(WORK);
+                availableParts.push(CARRY);
+                availableParts.push(TOUGH);
+                partsCost.push(BODYPART_COST.work)
+                partsCost.push(BODYPART_COST.carry)
+                partsCost.push(BODYPART_COST.move)
+                break;
+
+            case BodyType.WORKER_ONE_MOVE:
+            case BodyType.HAULER:
+            default:
+                return null;
+        }
+        return { baseBody, availableParts, basePrice, partsCost};
+        
     }
 }
 

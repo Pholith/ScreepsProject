@@ -18,7 +18,7 @@ class CreepContainer {
             if (newJob == null)
                 this.changeJob(Enums_1.Job.UPGRADER);
             else
-                this.changeJob(newJob);
+                this.changeJob(newJob.getJob());
         }
     }
     changeJob(job) {
@@ -28,6 +28,8 @@ class CreepContainer {
         var sources = this.creep.room.find(FIND_SOURCES);
         let target;
         target = sources[this.creep.memory.random % sources.length];
+        if (target.energy < 20)
+            target = sources[this.creep.memory.random + 1 % sources.length];
         if (this.creep.harvest(target) == ERR_NOT_IN_RANGE) {
             this.creep.moveTo(target);
         }

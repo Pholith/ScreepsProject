@@ -12,8 +12,9 @@ export class Harvester extends CreepContainer {
             }
         });
         targets = targets.sort((target) => {
-            if (target.structureType == STRUCTURE_EXTENSION) return -3;
-            if (target.structureType == STRUCTURE_SPAWN) return -2;
+            if (target.structureType == STRUCTURE_EXTENSION) return -10;
+            if (target.structureType == STRUCTURE_SPAWN) return -9;
+            if (target.structureType == STRUCTURE_TOWER) return -8;
             return 1;
         });
         return targets;

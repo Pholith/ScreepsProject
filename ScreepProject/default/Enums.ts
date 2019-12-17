@@ -18,8 +18,9 @@ export enum State {
 }
 
 export enum BodyType {
-    WORKER  = 1,
-    FIGHTER = 2,
-    HEALER  = 3,
-    RUNNER  = 4
+    WORKER,
+    WORKER_ONE_MOVE,
+    HAULER,
+    FIGHTER,
+    HEALER 
 }

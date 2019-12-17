@@ -20,9 +20,10 @@ var State;
 })(State = exports.State || (exports.State = {}));
 var BodyType;
 (function (BodyType) {
-    BodyType[BodyType["WORKER"] = 1] = "WORKER";
-    BodyType[BodyType["FIGHTER"] = 2] = "FIGHTER";
-    BodyType[BodyType["HEALER"] = 3] = "HEALER";
-    BodyType[BodyType["RUNNER"] = 4] = "RUNNER";
+    BodyType[BodyType["WORKER"] = 0] = "WORKER";
+    BodyType[BodyType["WORKER_ONE_MOVE"] = 1] = "WORKER_ONE_MOVE";
+    BodyType[BodyType["HAULER"] = 2] = "HAULER";
+    BodyType[BodyType["FIGHTER"] = 3] = "FIGHTER";
+    BodyType[BodyType["HEALER"] = 4] = "HEALER";
 })(BodyType = exports.BodyType || (exports.BodyType = {}));
 //# sourceMappingURL=Enums.js.map

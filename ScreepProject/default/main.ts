@@ -30,15 +30,19 @@ module.exports.loop = function loop() {
 
         // TOWER
         if (structure.structureType == STRUCTURE_TOWER) {
-            let closestHostile = structure.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+
+            let closestHostile: Creep = structure.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+                filter: (creep) =>  creep.body.map((part) => part.type).includes(ATTACK) ||
+                                    creep.body.map((part) => part.type).includes(RANGED_ATTACK)
+            });
             if (closestHostile) (structure as StructureTower).attack(closestHostile);
 
-            var closestDamagedStructure = structure.pos.findClosestByRange(FIND_STRUCTURES, {
+            /*var closestDamagedStructure = structure.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
-            });
-            if (closestDamagedStructure) {
+            });*/
+            /*if (closestDamagedStructure) {
                 (structure as StructureTower).repair(closestDamagedStructure);
-            }
+            }*/
         }
     }
 }

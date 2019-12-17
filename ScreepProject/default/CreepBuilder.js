@@ -6,6 +6,7 @@ const Harvester_1 = require("./Harvester");
 const Repairer_1 = require("./Repairer");
 const WallRepairer_1 = require("./WallRepairer");
 const Upgrader_1 = require("./Upgrader");
+const Protector_1 = require("./Protector");
 class CreepBuilder {
     static CreateContainer(creep) {
         switch (creep.memory.job) {
@@ -16,10 +17,10 @@ class CreepBuilder {
             case Enums_1.Job.REPAIRER: return new Repairer_1.Repairer(creep);
             case Enums_1.Job.UPGRADER: return new Upgrader_1.Upgrader(creep);
             case Enums_1.Job.WALL_REPAIRER: return new WallRepairer_1.WallRepairer(creep);
+            case Enums_1.Job.PROTECTOR: return new Protector_1.Protector(creep);
             //case Job.CLAIMER: return new ;
             //case Job.DEMOLISHER: return new ;
             //case Job.MINER: return new ;
-            //case Job.PROTECTOR: return new ;
             //case Job.REMOTE_HARVESTER: return new ;
             default:
                 throw new Error("Type non reconnu! " + creep.memory.job);

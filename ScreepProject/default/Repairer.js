@@ -8,7 +8,7 @@ class Repairer extends CreepContainer_1.CreepContainer {
             target.structureType == STRUCTURE_ROAD ||
             target.structureType == STRUCTURE_TOWER);
         targets = targets.filter((target) => target.hits < target.hitsMax);
-        targets.sort((target) => target.hits);
+        targets.sort((t1, t2) => (t1.hits < t2.hits) ? -1 : 1);
         if (targets[0])
             targets[0].room.visual.rect(targets[0].pos.x - 0.5, targets[0].pos.y - 0.5, 1, 1, { fill: "#ccffff", lineStyle: "dotted", stroke: "#000000", opacity: 0.3 });
         return targets;

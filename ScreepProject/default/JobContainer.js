@@ -70,7 +70,11 @@ exports.JobUpgrader = JobUpgrader;
 class JobProtector extends JobContainer {
     getJob() { return Enums_1.Job.PROTECTOR; }
     numberNeededOfThisJob(forceTheNeed = false) {
-        // TO IMPLEMENTE
+        if (Game.spawns["Spawn1"].room.find(FIND_HOSTILE_CREEPS, {
+            filter: (creep) => creep.body.map((part) => part.type).includes(ATTACK) ||
+                creep.body.map((part) => part.type).includes(RANGED_ATTACK)
+        })[0])
+            return 2;
         return 0;
     }
     getBodyType() {

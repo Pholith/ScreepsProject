@@ -67,6 +67,9 @@
     <TypeScriptCompile Include="default\CreepManager.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="default\Protector.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="default\Repairer.ts" />
     <TypeScriptCompile Include="default\types.d.ts">
       <SubType>Code</SubType>
