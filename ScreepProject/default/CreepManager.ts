@@ -79,8 +79,6 @@ export class CreepManager {
 
         let i: number = 0
         while (spawn.room.energyCapacityAvailable - totalCost > 45) {
-
-            console.log(spawn.room.energyCapacityAvailable - totalCost + " " + baseBody.partsCost[i % baseBody.availableParts.length]);
             if (spawn.room.energyCapacityAvailable - totalCost > baseBody.partsCost[i % baseBody.availableParts.length]) {
 
                 bodyParts.push(baseBody.availableParts[i % baseBody.availableParts.length]);
@@ -142,7 +140,7 @@ export class CreepManager {
                 basePrice += BODYPART_COST.work + BODYPART_COST.carry + BODYPART_COST.move
                 availableParts.push(WORK);
                 availableParts.push(CARRY);
-                availableParts.push(TOUGH);
+                availableParts.push(MOVE);
                 partsCost.push(BODYPART_COST.work)
                 partsCost.push(BODYPART_COST.carry)
                 partsCost.push(BODYPART_COST.move)
