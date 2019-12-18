@@ -70,12 +70,13 @@ class CreepManager {
         }
         let i = 0;
         while (spawn.room.energyCapacityAvailable - totalCost > 45) {
-            if (spawn.room.energyCapacityAvailable - totalCost > baseBody.basePrice[i % baseBody.availableParts.length]) {
+            console.log(spawn.room.energyCapacityAvailable - totalCost + " " + baseBody.partsCost[i % baseBody.availableParts.length]);
+            if (spawn.room.energyCapacityAvailable - totalCost > baseBody.partsCost[i % baseBody.availableParts.length]) {
                 bodyParts.push(baseBody.availableParts[i % baseBody.availableParts.length]);
-                baseBody.basePrice[i % baseBody.availableParts.length];
+                totalCost += baseBody.partsCost[i % baseBody.availableParts.length];
             }
             if (i > bodyParts.length + baseBody.availableParts.length)
-                return ERR_NOT_ENOUGH_ENERGY;
+                break;
             i++;
         }
         bodyParts = bodyParts.sort();

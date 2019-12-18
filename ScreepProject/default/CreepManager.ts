@@ -1,7 +1,6 @@
 ﻿import { Job, BodyType, State } from "./Enums";
 import { CreepUtils } from "./CreepUtils";
 import { jobInstances } from "./JobInstances";
-import { fork } from "cluster";
 import { JobContainer } from "./JobContainer";
 
 export class CreepManager {
@@ -69,7 +68,7 @@ export class CreepManager {
     public static SpawnBiggestCreep(spawn: StructureSpawn, job: JobContainer): ScreepsReturnCode {
         if (spawn.spawning) return ERR_BUSY;
 
-        let baseBody: { baseBody: Array<BodyPartConstant>, availableParts: Array<BodyPartConstant>, basePrice: number } = this.getBaseBody(job.getBodyType())
+        let baseBody: { baseBody: Array<BodyPartConstant>, availableParts: Array<BodyPartConstant>, basePrice: number, partsCost: Array<number> }= this.getBaseBody(job.getBodyType())
         let totalCost: number = baseBody.basePrice;
         let bodyParts: Array<BodyPartConstant> = baseBody.baseBody;
 
@@ -80,16 +79,16 @@ export class CreepManager {
 
         let i: number = 0
         while (spawn.room.energyCapacityAvailable - totalCost > 45) {
-            if (spawn.room.energyCapacityAvailable - totalCost > baseBody.basePrice[i % baseBody.availableParts.length]) {
+
+            console.log(spawn.room.energyCapacityAvailable - totalCost + " " + baseBody.partsCost[i % baseBody.availableParts.length]);
+            if (spawn.room.energyCapacityAvailable - totalCost > baseBody.partsCost[i % baseBody.availableParts.length]) {
 
                 bodyParts.push(baseBody.availableParts[i % baseBody.availableParts.length]);
-                baseBody.basePrice[i % baseBody.availableParts.length];
+                totalCost += baseBody.partsCost[i % baseBody.availableParts.length];
             }
-
-            if (i > bodyParts.length + baseBody.availableParts.length) return ERR_NOT_ENOUGH_ENERGY;
+            if (i > bodyParts.length + baseBody.availableParts.length) break ;
             i++;
         }
-
         bodyParts = bodyParts.sort();
         bodyParts.reverse()
         return this.spawnAndUpdateCounter(spawn, bodyParts, job.getJob(), job.getBodyType());

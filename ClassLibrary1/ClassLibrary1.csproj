@@ -7,7 +7,7 @@
     <ErrorReport>none</ErrorReport>
   </PropertyGroup>  
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /I /Q /y /g &quot;C:\Users\Vincent Buisset\AppData\Local\Screeps\scripts\ScreepsProject\ScreepProject\default&quot; &quot;C:\Users\Vincent Buisset\AppData\Local\Screeps\scripts\screeps.com\default&quot; /s" />
+    <Exec Command="xcopy /I /Q /y /g &quot;C:\Users\Vincent Buisset\AppData\Local\Screeps\scripts\ScreepsProject\ScreepProject\default&quot; &quot;C:\Users\Vincent Buisset\AppData\Local\Screeps\scripts\screeps.com\default&quot; /s&#xD;&#xA;&#xD;&#xA;" />
   </Target>
 </Project>
              
