@@ -71,6 +71,9 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="default\Repairer.ts" />
+    <TypeScriptCompile Include="default\TUNINGS.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="default\types.d.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

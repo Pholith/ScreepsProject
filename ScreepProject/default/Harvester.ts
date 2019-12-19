@@ -2,9 +2,9 @@
 
 export class Harvester extends CreepContainer {
 
-    protected findTarget(): Structure {
+    protected findTarget(): RoomObject {
         let targets: Structure[] = this.creep.room.find(FIND_STRUCTURES);
-        targets.filter(this.isOkayTarget);
+        targets = targets.filter(this.isOkayTarget);
         targets = targets.sort((target) => {
             if (target.structureType == STRUCTURE_EXTENSION) return -10;
             if (target.structureType == STRUCTURE_SPAWN) return -9;
@@ -15,19 +15,19 @@ export class Harvester extends CreepContainer {
     }
 
     protected isOkayTarget(obj: RoomObject): boolean {
-        let obj2 : Structure = obj as Structure;
-        return  (obj2.structureType == STRUCTURE_EXTENSION ||
-                obj2.structureType == STRUCTURE_SPAWN ||
-                obj2.structureType == STRUCTURE_TOWER)
-            &&
-            ((obj2 as any).store.getFreeCapacity(RESOURCE_ENERGY) > 0);
+        let obj2: Structure = obj as Structure;
+        if (obj2 == null) return false;
+        if (!(obj2.structureType == STRUCTURE_EXTENSION ||
+            obj2.structureType == STRUCTURE_SPAWN ||
+            obj2.structureType == STRUCTURE_TOWER)) return false;
+        return (obj2 as any).store.getFreeCapacity(RESOURCE_ENERGY) > 0;
     }
 
     protected action(): void {
         let target: Structure = this.getTarget() as Structure;
 
-        if (this.creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            this.creep.moveTo(target);
-        }
+        let result: ScreepsReturnCode = this.creep.transfer(target, RESOURCE_ENERGY);
+        if (result == ERR_FULL) this.getTarget(true);
+        if (result == ERR_NOT_IN_RANGE) this.creep.moveTo(target);
     }
 }

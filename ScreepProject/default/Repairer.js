@@ -12,7 +12,7 @@ class Repairer extends CreepContainer_1.CreepContainer {
     }
     isOkayTarget(obj) {
         let obj2 = obj;
-        return (obj2.structureType == STRUCTURE_RAMPART ||
+        return obj2 != null && (obj2.structureType == STRUCTURE_RAMPART ||
             obj2.structureType == STRUCTURE_ROAD ||
             obj2.structureType == STRUCTURE_TOWER) &&
             obj2.hits < obj2.hitsMax;

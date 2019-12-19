@@ -4,7 +4,7 @@ const CreepContainer_1 = require("./CreepContainer");
 class Harvester extends CreepContainer_1.CreepContainer {
     findTarget() {
         let targets = this.creep.room.find(FIND_STRUCTURES);
-        targets.filter(this.isOkayTarget);
+        targets = targets.filter(this.isOkayTarget);
         targets = targets.sort((target) => {
             if (target.structureType == STRUCTURE_EXTENSION)
                 return -10;
@@ -18,17 +18,21 @@ class Harvester extends CreepContainer_1.CreepContainer {
     }
     isOkayTarget(obj) {
         let obj2 = obj;
-        return (obj2.structureType == STRUCTURE_EXTENSION ||
+        if (obj2 == null)
+            return false;
+        if (!(obj2.structureType == STRUCTURE_EXTENSION ||
             obj2.structureType == STRUCTURE_SPAWN ||
-            obj2.structureType == STRUCTURE_TOWER)
-            &&
-                (obj2.store.getFreeCapacity(RESOURCE_ENERGY) > 0);
+            obj2.structureType == STRUCTURE_TOWER))
+            return false;
+        return obj2.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
     }
     action() {
         let target = this.getTarget();
-        if (this.creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        let result = this.creep.transfer(target, RESOURCE_ENERGY);
+        if (result == ERR_FULL)
+            this.getTarget(true);
+        if (result == ERR_NOT_IN_RANGE)
             this.creep.moveTo(target);
-        }
     }
 }
 exports.Harvester = Harvester;

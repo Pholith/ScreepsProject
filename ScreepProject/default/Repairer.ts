@@ -11,7 +11,7 @@ export class Repairer extends CreepContainer {
     }
     protected isOkayTarget(obj: RoomObject): boolean {
         let obj2: Structure = obj as Structure
-        return (obj2.structureType == STRUCTURE_RAMPART ||
+        return obj2 != null && (obj2.structureType == STRUCTURE_RAMPART ||
             obj2.structureType == STRUCTURE_ROAD ||
             obj2.structureType == STRUCTURE_TOWER) &&
             obj2.hits < obj2.hitsMax;

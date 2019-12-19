@@ -1,4 +1,6 @@
 import { BodyType, Job, State } from "./Enums";
+import { CreepUtils } from "./CreepUtils";
+import { TUNINGS } from "./TUNINGS";
 
 export abstract class JobContainer {
 
@@ -12,47 +14,10 @@ export class JobHarvester extends JobContainer {
     public getJob(): Job { return Job.HARVESTER; }
 
     public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
-        if (Game.spawns["Spawn1"].room.energyCapacityAvailable > Game.spawns["Spawn1"].room.energyAvailable) return 4;
+        if (Game.spawns[TUNINGS.MOTHER_SPAWN].room.energyCapacityAvailable > Game.spawns[TUNINGS.MOTHER_SPAWN].room.energyAvailable) return 4;
         return 1;
     }
 
-    public getBodyType(): BodyType {
-        return BodyType.WORKER;
-    }
-}
-export class JobBuilder extends JobContainer {
-    public getJob(): Job { return Job.BUILDER; }
-
-    public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
-        if (Game.spawns["Spawn1"].room.find(FIND_CONSTRUCTION_SITES).length > 1) {
-            if (forceTheNeed) return Infinity;
-            return 3
-        }
-        return 0;
-    }
-    public getBodyType(): BodyType {
-        return BodyType.WORKER;
-    }
-}
-export class JobRepairer extends JobContainer {
-    public getJob(): Job { return Job.REPAIRER; }
-
-    public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
-        // TO IMPLEMENTE
-        return 2;
-    }
-    public getBodyType(): BodyType {
-        return BodyType.WORKER;
-    }
-}
-export class JobWallRepairer extends JobContainer {
-    public getJob(): Job { return Job.WALL_REPAIRER; }
-
-    public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
-        // TO IMPLEMENTE
-        if (forceTheNeed) return Infinity
-        return 2;
-    }
     public getBodyType(): BodyType {
         return BodyType.WORKER;
     }
@@ -68,19 +33,54 @@ export class JobUpgrader extends JobContainer {
         return BodyType.WORKER;
     }
 }
-
 export class JobProtector extends JobContainer {
     public getJob(): Job { return Job.PROTECTOR; }
 
     public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
-        if (Game.spawns["Spawn1"].room.find(FIND_HOSTILE_CREEPS, {
-            filter: (creep) =>  creep.body.map((part) => part.type).includes(ATTACK) ||
-                                creep.body.map((part) => part.type).includes(RANGED_ATTACK)
-        })[0])
-            return 2;
-        return 0;
+        return CreepUtils.numberOfHostiles(Game.spawns[TUNINGS.MOTHER_SPAWN].room);
     }
+
     public getBodyType(): BodyType {
         return BodyType.FIGHTER;
     }
 }
+export class JobBuilder extends JobContainer {
+    public getJob(): Job { return Job.BUILDER; }
+
+    public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
+        let targets: ConstructionSite[] = TUNINGS.getMotherSpawn().room.find(FIND_CONSTRUCTION_SITES);
+        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER + 2) + 1 : Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
+    }
+    public getBodyType(): BodyType {
+        return BodyType.WORKER;
+    }
+}
+export class JobRepairer extends JobContainer {
+    public getJob(): Job { return Job.REPAIRER; }
+
+    public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
+        let targets: Structure[] = TUNINGS.getMotherSpawn().room.find(FIND_STRUCTURES);
+        targets.filter((target) =>  target != null && (target.structureType == STRUCTURE_RAMPART ||
+            target.structureType == STRUCTURE_ROAD ||
+            target.structureType == STRUCTURE_TOWER) &&
+            target.hits < target.hitsMax);
+        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER + 2)+1 : Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
+    }
+    
+    public getBodyType(): BodyType {
+        return BodyType.WORKER;
+    }
+}
+export class JobWallRepairer extends JobContainer {
+    public getJob(): Job { return Job.WALL_REPAIRER; }
+
+    public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
+        let targets: Structure[] = TUNINGS.getMotherSpawn().room.find(FIND_STRUCTURES);
+        targets.filter((target) => target != null && target.structureType == STRUCTURE_WALL && target.hits < target.hitsMax);
+        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER + 2)+1: Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
+    }
+    public getBodyType(): BodyType {
+        return BodyType.WORKER;
+    }
+}
+

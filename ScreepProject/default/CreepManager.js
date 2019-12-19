@@ -1,10 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Enums_1 = require("./Enums");
+const CreepUtils_1 = require("./CreepUtils");
 const JobInstances_1 = require("./JobInstances");
+const TUNINGS_1 = require("./TUNINGS");
 class CreepManager {
     static run() {
-        this.autoSpawn();
+        if (Game.time % 3 == 0) {
+            this.autoSpawn();
+        }
         if (Game.time % 20 == 0) {
             this.printReview();
         }
@@ -12,60 +16,43 @@ class CreepManager {
     }
     static autoSpawn() {
         if (this.choiceJob() != null) {
-            this.SpawnBiggestCreep(Game.spawns["Spawn1"], this.choiceJob());
+            this.SpawnBiggestCreep(Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN], this.choiceJob());
         }
         else if (this.choiceJob(true) != null) {
-            this.SpawnBiggestCreep(Game.spawns["Spawn1"], this.choiceJob(true));
+            this.SpawnBiggestCreep(Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN], this.choiceJob(true));
         }
-        if (Game.spawns["Spawn1"].spawning) {
-            Game.spawns['Spawn1'].room.visual.text('🛠️' + Game.spawns['Spawn1'].spawning.name, Game.spawns['Spawn1'].pos.x + 1, Game.spawns['Spawn1'].pos.y, { align: 'left', opacity: 0.8 });
+        if (Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN].spawning) {
+            Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN].room.visual.text('🛠️' + Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN].spawning.name, Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN].pos.x + 1, Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN].pos.y, { align: 'left', opacity: 0.8 });
         }
     }
     static printReview() {
         console.log("\n");
         console.log("======= Colony informations =======");
-        console.log("Total number of creeps = " + this.numberOfScreeps());
-        let baseController = Game.spawns["Spawn1"].room.controller;
+        console.log("Total number of creeps = " + CreepUtils_1.CreepUtils.numberOfScreeps());
+        let baseController = Game.spawns[TUNINGS_1.TUNINGS.MOTHER_SPAWN].room.controller;
         console.log("Controller level = " + baseController.level + " (" + (Math.floor(baseController.progress / baseController.progressTotal * 100)) + "%)");
         for (let job of JobInstances_1.jobInstances) {
-            console.log("  " + job.getJob() + "\tActual/Needed = " + this.numberOfRole(job.getJob()) + "/" + job.numberNeededOfThisJob());
+            console.log("  " + job.getJob() + "\tActual/Needed = " + CreepUtils_1.CreepUtils.numberOfRole(job.getJob()) + "/" + job.numberNeededOfThisJob());
         }
         console.log("  Next job = " + this.choiceJob().getJob());
         console.log("\n");
     }
     static choiceJob(forceTheNeed = false) {
         for (var job of JobInstances_1.jobInstances) {
-            if (job.numberNeededOfThisJob(forceTheNeed) > this.numberOfRole(job.getJob())) {
+            if (job.numberNeededOfThisJob(forceTheNeed) > CreepUtils_1.CreepUtils.numberOfRole(job.getJob())) {
                 return job;
             }
         }
         return null;
     }
-    static numberOfScreeps() {
-        let counter = 0;
-        for (var _creep in Game.creeps) {
-            counter++;
-        }
-        return counter;
-    }
-    static numberOfRole(job) {
-        let creepsThisJob = new Array();
-        for (var Creep in Game.creeps) {
-            let forCreep = Game.creeps[Creep];
-            if (forCreep.memory.job == job) {
-                creepsThisJob.push(forCreep);
-            }
-        }
-        return creepsThisJob.length;
-    }
-    static SpawnBiggestCreep(spawn, job) {
+    static SpawnBiggestCreep(spawn, job, superImportant = false) {
         if (spawn.spawning)
             return ERR_BUSY;
         let baseBody = this.getBaseBody(job.getBodyType());
         let totalCost = baseBody.basePrice;
         let bodyParts = baseBody.baseBody;
         // case of 0 harvester
-        if (this.numberOfRole(Enums_1.Job.HARVESTER) < 1 && spawn.room.energyAvailable < spawn.room.energyCapacityAvailable) {
+        if (CreepUtils_1.CreepUtils.numberOfRole(Enums_1.Job.HARVESTER) < 1 && spawn.room.energyAvailable < spawn.room.energyCapacityAvailable) {
             return this.spawnAndUpdateCounter(spawn, bodyParts, job.getJob(), job.getBodyType());
         }
         let i = 0;
@@ -133,7 +120,24 @@ class CreepManager {
                 partsCost.push(BODYPART_COST.move);
                 break;
             case Enums_1.BodyType.WORKER_ONE_MOVE:
+                baseBody.push(WORK);
+                baseBody.push(MOVE);
+                baseBody.push(CARRY);
+                basePrice += BODYPART_COST.work + BODYPART_COST.carry + BODYPART_COST.move;
+                availableParts.push(WORK);
+                availableParts.push(CARRY);
+                partsCost.push(BODYPART_COST.work);
+                partsCost.push(BODYPART_COST.carry);
+                break;
             case Enums_1.BodyType.HAULER:
+                baseBody.push(MOVE);
+                baseBody.push(CARRY);
+                basePrice += BODYPART_COST.carry + BODYPART_COST.move;
+                availableParts.push(CARRY);
+                availableParts.push(MOVE);
+                partsCost.push(BODYPART_COST.carry);
+                partsCost.push(BODYPART_COST.move);
+                break;
             default:
                 return null;
         }
