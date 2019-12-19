@@ -11,3 +11,7 @@ interface CreepMemory {
 interface Memory {
     creepCounter: number;
 }
+
+interface RoomObject {
+    id: String;
+}
