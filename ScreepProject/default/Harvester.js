@@ -32,7 +32,7 @@ class Harvester extends CreepContainer_1.CreepContainer {
         if (result == ERR_FULL)
             this.getTarget(true);
         if (result == ERR_NOT_IN_RANGE)
-            this.creep.moveTo(target);
+            this.creep.moveTo(target, { maxRooms: 0 });
     }
 }
 exports.Harvester = Harvester;

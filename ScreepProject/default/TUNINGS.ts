@@ -8,4 +8,5 @@ export class TUNINGS {
     }
 
     public static readonly TARGET_PER_WORKER: number = 70;
+    public static readonly SIGN_TEXT: string = "Hello :D";
 }

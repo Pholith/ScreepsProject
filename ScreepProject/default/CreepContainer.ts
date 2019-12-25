@@ -1,6 +1,7 @@
 ﻿import { State, BodyType, Job } from "./Enums";
 import { CreepManager } from "./CreepManager";
 import { JobContainer } from "./JobContainer";
+import { TUNINGS } from "./TUNINGS";
 
 export abstract class CreepContainer {
 
@@ -12,8 +13,6 @@ export abstract class CreepContainer {
 
     public run(): void {
         this.updateState();
-        if (this.creep.memory.state == State.HARVEST) this.harvestEnergy();
-        if (this.creep.memory.state == State.ACTION) this.action();
 
         // change de job si attend
         if (this.isWaiting()) {
@@ -21,6 +20,9 @@ export abstract class CreepContainer {
             if (newJob == null) this.changeJob(Job.UPGRADER);
             else this.changeJob(newJob.getJob());
         }
+
+        if (this.creep.memory.state == State.HARVEST) this.harvestEnergy();
+        if (this.creep.memory.state == State.ACTION) this.action();
     }
 
     private changeJob(job: Job) : void {
@@ -29,13 +31,13 @@ export abstract class CreepContainer {
     }
 
     protected harvestEnergy(): void {
-        var sources = this.creep.room.find(FIND_SOURCES);
+        var sources = TUNINGS.getMotherSpawn().room.find(FIND_SOURCES);
         let target: Source;
         target = sources[this.creep.memory.random % sources.length];
         // Si le filon est vide, change de filon
         if (target.energy < 20) target = sources[(this.creep.memory.random + 1) % sources.length];
         if (this.creep.harvest(target) == ERR_NOT_IN_RANGE) {
-            this.creep.moveTo(target);
+            this.creep.moveTo(target, { maxRooms: 0 } );
         }
     }
 
@@ -57,14 +59,16 @@ export abstract class CreepContainer {
     }
 
     protected getTarget(updateTarget: boolean = false): RoomObject {
-        if (this.creep.memory.target == null ||
+        /*if (this.creep.memory.target == null || 
             !this.isOkayTarget(Game.getObjectById(this.creep.memory.target.id)) ||
             updateTarget) {
-            this.creep.memory.target = this.findTarget().id;
-            this.creep.memory.target
+            let target: RoomObject = this.findTarget();
+            if (target) this.creep.memory.target = target.id;
+            else return null;
         }
 
-        return Game.getObjectById(this.creep.memory.target);
+        return Game.getObjectById(this.creep.memory.target);*/
+        return this.findTarget();
     }
 
     // A implémenter pour que le creep ne reste pas bloqué sur une cible non ok

@@ -28,6 +28,6 @@ export class Harvester extends CreepContainer {
 
         let result: ScreepsReturnCode = this.creep.transfer(target, RESOURCE_ENERGY);
         if (result == ERR_FULL) this.getTarget(true);
-        if (result == ERR_NOT_IN_RANGE) this.creep.moveTo(target);
+        if (result == ERR_NOT_IN_RANGE) this.creep.moveTo(target, { maxRooms: 0 });
     }
 }
