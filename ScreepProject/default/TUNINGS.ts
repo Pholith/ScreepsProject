@@ -7,6 +7,6 @@ export class TUNINGS {
         return Game.spawns[this.MOTHER_SPAWN];
     }
 
-    public static readonly TARGET_PER_WORKER: number = 70;
+    public static readonly TARGET_PER_WORKER: number = 20;
     public static readonly SIGN_TEXT: string = "Hello :D";
 }

@@ -10,7 +10,7 @@ export class CreepManager {
         if (Game.time % 3 == 0) {
             this.autoSpawn();
         }
-        if (Game.time % 20 == 0) {
+        if (Game.time % 15 == 0) {
             this.printReview();
         }
         //Game.notify()

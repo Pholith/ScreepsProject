@@ -44,7 +44,9 @@ class JobBuilder extends JobContainer {
     getJob() { return Enums_1.Job.BUILDER; }
     numberNeededOfThisJob(forceTheNeed = false) {
         let targets = TUNINGS_1.TUNINGS.getMotherSpawn().room.find(FIND_CONSTRUCTION_SITES);
-        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER + 2) + 1 : Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER) + 1;
+        if (targets.length == 0)
+            return 0;
+        return Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER) + 1;
     }
     getBodyType() {
         return Enums_1.BodyType.WORKER;
@@ -55,11 +57,13 @@ class JobRepairer extends JobContainer {
     getJob() { return Enums_1.Job.REPAIRER; }
     numberNeededOfThisJob(forceTheNeed = false) {
         let targets = TUNINGS_1.TUNINGS.getMotherSpawn().room.find(FIND_STRUCTURES);
-        targets.filter((target) => target != null && (target.structureType == STRUCTURE_RAMPART ||
+        targets = targets.filter((target) => target != null && (target.structureType == STRUCTURE_RAMPART ||
             target.structureType == STRUCTURE_ROAD ||
             target.structureType == STRUCTURE_TOWER) &&
             target.hits < target.hitsMax);
-        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER + 2) + 1 : Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER) + 1;
+        if (targets.length == 0)
+            return 0;
+        return Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER) + 1;
     }
     getBodyType() {
         return Enums_1.BodyType.WORKER;
@@ -70,8 +74,10 @@ class JobWallRepairer extends JobContainer {
     getJob() { return Enums_1.Job.WALL_REPAIRER; }
     numberNeededOfThisJob(forceTheNeed = false) {
         let targets = TUNINGS_1.TUNINGS.getMotherSpawn().room.find(FIND_STRUCTURES);
-        targets.filter((target) => target != null && target.structureType == STRUCTURE_WALL && target.hits < target.hitsMax);
-        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER + 2) + 1 : Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER) + 1;
+        targets = targets.filter((target) => target != null && target.structureType == STRUCTURE_WALL && target.hits < target.hitsMax);
+        if (targets.length == 0)
+            return 0;
+        return Math.floor(targets.length / TUNINGS_1.TUNINGS.TARGET_PER_WORKER) + 1;
     }
     getBodyType() {
         return Enums_1.BodyType.WORKER;

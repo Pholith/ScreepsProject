@@ -49,7 +49,8 @@ export class JobBuilder extends JobContainer {
 
     public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
         let targets: ConstructionSite[] = TUNINGS.getMotherSpawn().room.find(FIND_CONSTRUCTION_SITES);
-        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER + 2) + 1 : Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
+        if (targets.length == 0) return 0;
+        return Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
     }
     public getBodyType(): BodyType {
         return BodyType.WORKER;
@@ -60,11 +61,12 @@ export class JobRepairer extends JobContainer {
 
     public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
         let targets: Structure[] = TUNINGS.getMotherSpawn().room.find(FIND_STRUCTURES);
-        targets.filter((target) =>  target != null && (target.structureType == STRUCTURE_RAMPART ||
+        targets = targets.filter((target) =>  target != null && (target.structureType == STRUCTURE_RAMPART ||
             target.structureType == STRUCTURE_ROAD ||
             target.structureType == STRUCTURE_TOWER) &&
             target.hits < target.hitsMax);
-        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER + 2)+1 : Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
+        if (targets.length == 0) return 0;
+        return Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
     }
     
     public getBodyType(): BodyType {
@@ -76,8 +78,9 @@ export class JobWallRepairer extends JobContainer {
 
     public numberNeededOfThisJob(forceTheNeed: boolean = false): number {
         let targets: Structure[] = TUNINGS.getMotherSpawn().room.find(FIND_STRUCTURES);
-        targets.filter((target) => target != null && target.structureType == STRUCTURE_WALL && target.hits < target.hitsMax);
-        return (forceTheNeed) ? Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER + 2)+1: Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
+        targets = targets.filter((target) => target != null && target.structureType == STRUCTURE_WALL && target.hits < target.hitsMax);
+        if (targets.length == 0) return 0;
+        return Math.floor(targets.length / TUNINGS.TARGET_PER_WORKER)+1;
     }
     public getBodyType(): BodyType {
         return BodyType.WORKER;

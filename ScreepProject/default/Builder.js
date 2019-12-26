@@ -11,7 +11,7 @@ class Builder extends CreepContainer_1.CreepContainer {
     action() {
         let target = this.getTarget();
         if (this.creep.build(target) == ERR_NOT_IN_RANGE) {
-            this.creep.moveTo(target);
+            this.creep.moveTo(target, { maxRooms: 0 });
         }
     }
 }

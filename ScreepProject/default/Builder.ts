@@ -12,7 +12,7 @@ export class Builder extends CreepContainer {
         let target: ConstructionSite = this.getTarget() as ConstructionSite;
 
         if (this.creep.build(target) == ERR_NOT_IN_RANGE) {
-            this.creep.moveTo(target);
+            this.creep.moveTo(target, { maxRooms: 0 });
         }
     }
 }
